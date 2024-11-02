@@ -20,3 +20,8 @@ Podría funcionar bien para un sistema bancario, porque ya se tiene un esquema d
     - A.C.I.D.
 
 No hay que estar casado con una sola tecnología, hay que estar abiertos a usarlas cuando es necesario.
+
+## ¿Qué son las APIs?
+Una API (Interfaz de Programación de Aplicaciones, por sus siglas en inglés) es un conjunto de reglas y protocolos que permite que diferentes aplicaciones o servicios se comuniquen entre sí. Las APIs definen cómo se deben estructurar las solicitudes y respuestas entre sistemas, facilitando el intercambio de datos o la ejecución de funciones entre aplicaciones sin necesidad de conocer sus detalles internos.
+
+Por ejemplo, una API puede permitir que una aplicación móvil acceda a los datos de una base de datos en la nube o que dos servicios web intercambien información.
