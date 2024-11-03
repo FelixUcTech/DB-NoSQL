@@ -13,3 +13,7 @@ Una ventaja para este tipo de tecnologías es que pueden tener una topología de
 ![Topoligia 2](/A02.MongoDB/A02.MongoDB-Imagenes/topologia2.png)
 
 
+Nuestra base de datos en la nube requiere que configuremos
+- Un usuario este se configura en la nube, sin embargo que nuestra base de datos este en la nube no indica que cualquiera se pueda conectar desde cualquier lado, en la sección de NetworkAccess tenemos declaradas las ips a las que les damos permiso de hacer el login.
+    - Peering podría decirse que es una forma avanzada de utilizar las configuraciones de acceso a la red que se tengan en algun servicio de nube.
+
