@@ -1,5 +1,9 @@
 # Fundamentos
 
+## Archivo .editorconfig
+El archivo .editorconfig establece reglas de formato para varios tipos de documentos, como archivos de código fuente (JS, Python, etc.), HTML, CSS, y otros. Su alcance incluye la configuración de espacios, tabulaciones y finales de línea, facilitando la consistencia del estilo en proyectos colaborativos.
+
+
 ## Bases de datos NoSQL (Not Only SQL)
 
 Las bases de datos NoSQL su escalamiento es más sencillo que de una base de datos SQL, además hay que tomar en cuenta que también importa que estrategía de escalamiento tome uno para aumento de capacidades, también las bases de datos NoSQL son buenas para la replicación.

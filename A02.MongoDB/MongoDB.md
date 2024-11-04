@@ -1,4 +1,24 @@
 # Mongo DB
+
+## Introducción
+Mongo DB representa el 45% del mercado en bases de datos a Julio del 2024, al igual que algunos servicios privados como Azure Cosmos DB, conecta con ciertas herramientas. Es un poliglota persistente.
+
+
+Mongo DB guarda los datos en formato BSON (binary JSON)
+
+Atlas se puede llegar a considerar cómo un poliglota persistente. MongoDB Atlas es una plataforma de base de datos en la nube gestionada para bases de datos MongoDB. Permite crear, desplegar y escalar bases de datos MongoDB sin preocuparse por la infraestructura, ya que gestiona automáticamente el rendimiento, la seguridad y las copias de seguridad.
+
+Una ventaja para este tipo de tecnologías es que pueden tener una topología de nodos, funcionan como redundancias de servicio, en cuanto se pe
+
+![Topoligia 1](/A02.MongoDB/A02.MongoDB-Imagenes/topologia.png)
+
+![Topoligia 2](/A02.MongoDB/A02.MongoDB-Imagenes/topologia2.png)
+
+
+Nuestra base de datos en la nube requiere que configuremos
+- Un usuario este se configura en la nube, sin embargo que nuestra base de datos este en la nube no indica que cualquiera se pueda conectar desde cualquier lado, en la sección de NetworkAccess tenemos declaradas las ips a las que les damos permiso de hacer el login.
+    - Peering podría decirse que es una forma avanzada de utilizar las configuraciones de acceso a la red que se tengan en algun servicio de nube.
+
 ## ¿Qué son los documentos y colecciones?
 ### Documentos
 Un documento es una forma de organizar y almacenar información con un conjunto de pares **clave-valor** o **campo-valor**, este conjunto de información es alusivo a un dominio, es decir, la información de un producto, curso, campaña, inventario, etc, ese sería el dominio o igual llamadas identidades.
@@ -67,23 +87,21 @@ MongoDB almacena documentos en una colección, usualmente con campos comunes ent
 ![Coleccionnes-Documentos](/A02.MongoDB/A02.MongoDB-Imagenes/Colecciones-Documentos.png)
 
 
-## Introducción
-Mongo DB representa el 45% del mercado en bases de datos a Julio del 2024, al igual que algunos servicios privados como Azure Cosmos DB, conecta con ciertas herramientas. Es un poliglota persistente.
+## Atlas la versión en la Nube de MongoDB
+Una herramienta gratuita para empezar aprender acerca de las bases NoSQL, es atlas una versión que puede ser gratuita y te ayuda a concoer el manejo de una base de datos NoSQL.
+
+https://www.mongodb.com/es/cloud/atlas/register
+
+https://www.mongodb.com/es
 
 
-Mongo DB guarda los datos en formato BSON (binary JSON)
+## Trabajando MongoDB en Visual Studio Code 
 
-Atlas se puede llegar a considerar cómo un poliglota persistente. MongoDB Atlas es una plataforma de base de datos en la nube gestionada para bases de datos MongoDB. Permite crear, desplegar y escalar bases de datos MongoDB sin preocuparse por la infraestructura, ya que gestiona automáticamente el rendimiento, la seguridad y las copias de seguridad.
+Para realizar esta configuración es necesario intalar la estisión:
 
-Una ventaja para este tipo de tecnologías es que pueden tener una topología de nodos, funcionan como redundancias de servicio, en cuanto se pe
+![MongoDB-for-VS-Code](/A02.MongoDB/A02.MongoDB-Imagenes/MongoDB-for-VS-Code.png)
 
-![Topoligia 1](/A02.MongoDB/A02.MongoDB-Imagenes/topologia.png)
-
-![Topoligia 2](/A02.MongoDB/A02.MongoDB-Imagenes/topologia2.png)
+Esta herramienta nos permite guardar nuestras consultar y dar una facilidad de trabajo en un entorno que puede ser más familiar, ejemplo el editor de codigo Visual Studio Code.
 
 
-Nuestra base de datos en la nube requiere que configuremos
-- Un usuario este se configura en la nube, sin embargo que nuestra base de datos este en la nube no indica que cualquiera se pueda conectar desde cualquier lado, en la sección de NetworkAccess tenemos declaradas las ips a las que les damos permiso de hacer el login.
-    - Peering podría decirse que es una forma avanzada de utilizar las configuraciones de acceso a la red que se tengan en algun servicio de nube.
-
-
+## Conclusiones
