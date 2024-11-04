@@ -17,9 +17,11 @@ Nos permite una alta disponibildad, dado que cómo maquinas (procesadores) virtu
 ![Escalamiento-Horizontal](/A01.Fundamentos/A01.Fundamentos-Imagenes/escalamiento-horizontal.png)
 
 
-Comparación de costos a lo largo del tiempo
+**Comparación de costos a lo largo del tiempo**
 
 ![Escalamiento-comparacion](/A01.Fundamentos/A01.Fundamentos-Imagenes/escalamiento-comparacion.png)
+
+**Replicación**
 
 ![replicacion-topologia](/A01.Fundamentos/A01.Fundamentos-Imagenes/replicacion-topologia.png)
 
