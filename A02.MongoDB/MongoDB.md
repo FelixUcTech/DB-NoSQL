@@ -105,6 +105,12 @@ Para realizar esta configuración es necesario intalar la estisión:
 
 Esta herramienta nos permite guardar nuestras consultar y dar una facilidad de trabajo en un entorno que puede ser más familiar, ejemplo el editor de codigo Visual Studio Code.
 
+**Para conectarse a la base de datos en la nube**
+
+La base de datos se configura en la nube, Atlabas de MongoDB, posterioremente en MongoCompass Se conecta uno a la base de datos, ahí el string o uri, se usa para que mediente la estesión de Mongo de BD se pueda conectar uno a la base de datos.
+
+![coneccion-mongodb-vsc](/A02.MongoDB/A02.MongoDB-Imagenes/coneccion-mongodb-vsc.png)
+
 ### Docker
 Es necesario instalar dooker, dado que los dirver requeridos para correr alguna tecnología pueden ser gestionados por Docker y es cómo crear un entorno virtual donde se integra todo lo necesario para trabajar diferentes bases de datos para este caso práctico.
 
@@ -154,6 +160,12 @@ volumes a nivel global:
 
  - La sección volumes: en la parte inferior del archivo declara mongo_data como un volumen gestionado por Docker. Si el volumen aún no existe, Docker lo creará automáticamente.
 
+Una vez creada la intancia en Docker se puede acceder mediante:
+
+
+![coneccion-mongodb-vsc](/A02.MongoDB/A02.MongoDB-Imagenes/coneccion-mongodb-vsc.png)
+
+
 #### Comandos necesarios desde terminal
 
 **Para levantar el servicio o la imagen de mongo**
@@ -161,11 +173,22 @@ volumes a nivel global:
 Para este caso práctico lo estamos corriendo en Ubuntu 
 
 ```sh
-
-docker-compose up -d mongodb
-
+docker-compose up -d mongoDB
 ```
+
+**Comando para hacer el check (verificar el servicio)**
+
+```sh
+docker-compose ps
+```
+### Conexión mediante terminal de mongo
+
+Hacia Atlas, la versión en la nube o hacia Docker la versión local de la base de datos.
+
+Vamos a correr la terminal de mongo desde el contenedor, dado que el contenedor que generamos ya tiene corriendo la terminal mencionada.
+
 
 
 
 ## Conclusiones
+

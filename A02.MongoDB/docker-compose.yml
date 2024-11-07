@@ -2,18 +2,18 @@ version: '3.9'
 
 services:
   mongoDB:
-    image: mongo: 8.0 #Si no se pone la versión mandaría a llamar la última versión que se tenga en el Hub
+    image: mongo:8.0 #Si no se pone la versión mandaría a llamar la última versión que se tenga en el Hub
     # Significa que estás especificando que Docker descargue
     # la imagen de MongoDB Server versión 8.0. Esta es la última
     # versión estable para el servidor de base de datos, y 
     # la opción correcta para tu configuración en Docker.
     ports:
-      -27017:27017 # Este puerto lo define mongo, se puede ajustar pero normalmetne no se cambia.
+      - 27017:27017 # Este puerto lo define mongo, se puede ajustar pero normalmetne no se cambia.
     environment:
       - MONGO_INITDB_ROOT_USERNAME = USER
-      - MONGO_INITDB_ROOT_USERNAME = Password01
-    volumens: #Es la instancia donde se guarda la información aun se apague el doker
-      - ./mongo_data:/data/db
+      - MONGO_INITDB_ROOT_PASSWORD = Password01
+    volumes: #Es la instancia donde se guarda la información aun se apague el doker
+      - ./mongo_data:/data/db -d mongo
 
 
       

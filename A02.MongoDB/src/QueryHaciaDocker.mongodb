@@ -1,0 +1,4 @@
+use("Tienda")
+
+db.Productos.find({ "Autor": { "$regex": "^a", "$options": "i" } })
+
