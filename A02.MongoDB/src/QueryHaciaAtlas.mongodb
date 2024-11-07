@@ -1,0 +1,3 @@
+use("sample_training")
+
+db.companies.find({ "name": { "$regex": "^w", "$options": "i" } })

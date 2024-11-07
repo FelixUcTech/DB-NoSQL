@@ -181,14 +181,97 @@ docker-compose up -d mongoDB
 ```sh
 docker-compose ps
 ```
+
 ### Conexión mediante terminal de mongo
 
 Hacia Atlas, la versión en la nube o hacia Docker la versión local de la base de datos.
 
 Vamos a correr la terminal de mongo desde el contenedor, dado que el contenedor que generamos ya tiene corriendo la terminal mencionada.
 
+Para conectar con el servicio que está corriendo en Docker, la terminal de mongo usamos el siguiente comando
+
+**Ejecutamos en Ubuntu**
+
+``` sh
+docker-compose exec mongoDB bash
+```
+Algunos parametros pueden no ser necesarios para levantar el servicio de la terminal
+
+```
+felixuctech@FELIXPOWER:~/DB-NoSQL/A02.MongoDB$ docker-compose exec mongoDB bash
+WARN[0000] /home/felixuctech/DB-NoSQL/A02.MongoDB/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
+```
+Normalmente los contenedores están basados en sistemas IUNIX, por lo cual puedes encontrar ese mismo sistema de carpetas. Y los comando son similares a la distribución que manejes.
+
+![terminalmongo](/A02.MongoDB/A02.MongoDB-Imagenes/terminalmongo.png)
+
+Desde la terminal **mongosh** Nos podemos conectar a cualquier Instacia de mongo, la del Docker que es local o la de la nube que es de prueba de Atlas.
+
+**Para conectarnos con Mongo Hacia Docker**
+``` sh
+mongosh "mongodb://localhost:27017/?tls=false"
+```
+
+Para salir de La instancia de mongo se require escribir "exit" y enter, ahora si se puede acceder a la siguiente:
+
+**Para conectarnos con Mongo Hacia Atlas**
+``` sh
+mongosh "mongodb+srv://demotest:1998felix123456@demoatlasfelix.xds4g.mongodb.net/"
+```
+En cada instancia se puede correr los compando de prueba en que se encuentra en: 
+
+[QueryHaciaAtlas.mongodb](/A02.MongoDB/src/QueryHaciaAtlas.mongodb)
+
+[QueryHaciaDocker.mongodb](/A02.MongoDB/src/QueryHaciaDocker.mongodb)
 
 
+
+
+## JSON VS BSON
+
+Normalmente Mongo guarda en BSON pero nosotros interactuamos con el formato de JSON por facilidad de lectura y entendiemiento. Esto por rendimiento.
+
+### JSON
+
+Ventajas:
+
+- Amigable
+- Se puede leer
+    - Es un formato clave valor
+- Es un formato muy usado
+
+Desventajas: 
+
+- Está basado en texto, por ende consume mucho espacio
+- Es limitado, solo puede guardar:
+    - String
+    - Boolean
+    - Number
+    - Arrays
+
+### BSON
+Es una creación de Mongo, es un formato más optimizado pero muy dificil de leer:
+
+![JsonVSBson](/A02.MongoDB/A02.MongoDB-Imagenes/jsonVSbson.png)
+
+Ventajas:
+
+- Representación binaria de JSON
+- No consume espacio
+- Alto rendimiento
+- Tipos de datos: +, date, raw binary, integer, long,  float
+
+Desventajas: 
+
+- No es estandar
+- Es un leguaje para la maquina 
+
+Más acerca de BSON
+
+https://www.mongodb.com/resources/languages/bson
+
+
+## 
 
 ## Conclusiones
 
