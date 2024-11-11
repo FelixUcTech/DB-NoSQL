@@ -1,4 +1,182 @@
+// // Como en SQL o PosgreSQL si seleccionas y corres el Query, solo ejecutará lo seleccionado
+// // Para habilitar parte del codigo quitar los comentarios podemos usar "Ctr + }"
 use("Tienda")
 
-db.Productos.find({ "Autor": { "$regex": "^a", "$options": "i" } })
+// //----------------------------
+// // Consulta de filtro
+// db.Productos.find({ "Autor": { "$regex": "^a", "$options": "i" } })
+
+// //----------------------------
+// // Insertar por uno
+// db.Productos.insertOne({
+//     _id: 101,
+//     name: "Barco en la tempestad",
+//     price: 8000.00,
+//     autor: "Adira I. Uc H."
+// })
+
+// db.Productos.insertOne({
+//     _id: 10,
+//     name: "Barco en la tempestad",
+//     price: 8000.00,
+//     autor: "Adira I. Uc H."
+// })
+
+// db.Productos.insertOne({
+//     _id: 201,
+//     name: "Medusa por la ventana",
+//     price: 2000.00,
+//     autor: "Anette Michel L. R."
+// })
+
+// db.Productos.find() // Busca todos los documento de la colección
+
+// db.Productos.drop() // Elimina todos los documentos de una colección
+
+// //Si al ajecutar un query, hay un error solo se habrá ejecutado hasta la sentencia previa al error, lo demás no se habrá realizado.
+// //Si hay documentos existentes, y se genera un colición hay una manera de solventarlo
+
+// //----------------------------
+// //Insertar por varios
+// db.Productos.drop()
+// db.Productos.insertOne({
+//     _id: 201,
+//     name: "Cucaracha comiendo amburguesa",
+//     price: 2000.00,
+//     autor: "Anette Michel L. R."
+// })
+
+
+
+// db.Productos.insertMany([  //si hay una colision de _id  si inserta pero hasta la colision
+//     {
+//         _id: 201,
+//         name: "Cucaracha comiendo amburguesa",
+//         price: 2000.00,
+//         autor: "Anette Michel L. R."
+//     },
+//     {
+//         _id: 202,
+//         name: "Bob Ordellando medusa",
+//         price: 2000.00,
+//         autor: "Anette Michel L. R."
+//     },
+//     {
+//         _id: 203,
+//         name: "Medusa por la ventana",
+//         price: 2000.00,
+//         autor: "Anette Michel L. R."
+//     }
+// ],{
+//     ordered: false //si hay una colision de _id  si inserta pero no inserta los colisionados
+// }) 
+
+// db.Productos.find()
+
+// //----------------------------
+// // Actualizar un producto
+// // Operador $SET
+// db.Productos.updateOne(
+//     //Query, especificar donde hacer el cambio
+//     { _id: 201},
+//     // Cambios, de 1 a los que sean requeridos
+//     {$set:{
+//         autor: "Adira Itzel Uc Hernández",
+//         price: 250.00
+//     }}
+// )
+
+// //----------------------------
+// // Normalmente se incrementan valores númericos
+// // Operador $Inc
+// db.Productos.updateOne(
+//     //Query, especificar donde hacer el cambio
+//     { _id: 201},
+//     // Cambios, de 1 a los que sean requeridos
+//     {$inc:{
+//         price: 25 //incremento el 10%
+//     }}
+// )
+
+// //----------------------------
+// //Actualizar por el ID del objto de Mongo
+// db.Productos.drop()
+// db.Productos.insertOne({
+//     name: "Cucaracha comiendo amburguesa",
+//     price: 2000.00,
+//     autor: "Anette Michel L. R."
+// })
+
+// db.Productos.updateOne(
+//     //Query, especificar donde hacer el cambio
+//     { _id: ObjectId('672ceeeca5b25e3f217962b9')},
+//     // Cambios, de 1 a los que sean requeridos
+//     {$inc:{
+//         price: -25 //incremento el 10%
+//     }}
+// )
+// db.Productos.find()
+
+//----------------------------
+// db.inventory.drop()
+// db.inventory.insertMany([
+//   { _id: 1, item: { name: "item ab", code: "123", description : "Single line description."    }, qty: 15, tags: [ "school", "book", "bag", "headphone", "appliance" ], },
+//   { _id: 2, item: { name: "item cd", code: "123", description : "First line\nSecond line"     }, qty: 20, tags: [ "appliance", "school", "book" ] },
+//   { _id: 3, item: { name: "item ij", code: "456", description : "Many spaces before     line" }, qty: 25, tags: [ "school", "book" ] },
+//   { _id: 4, item: { name: "item xy", code: "456", description : "Multiple\nline description"  }, qty: 30, tags: [ "electronics", "school" ] },
+//   { _id: 5, item: { name: "item mn", code: "000" }, qty: 20, tags: [ "appliance", "school" ] },
+// ])
+
+// // ----------------------------
+// // USO DE PUSH EN ARRAYS PARA PONER ELEMENTOS DENTRO DE UN ARRAY
+// use("Tienda")
+// db.inventory.updateOne(
+//     {_id: 4},
+//     {
+//         $push:{
+//             tags: "headphone"
+//         } 
+//     }
+// )
+// db.inventory.find()
+
+//----------------------------
+//USO DE PULL EN ARRAYS PARA PONER ELEMENTOS DENTRO DE UN ARRAY
+// db.inventory.updateOne(
+//     {},
+//     {
+//         $pull:{
+//             tags: "headphone"
+//         } 
+//     }
+// )
+// db.inventory.find()
+
+//----------------------------
+//USO DE PULL EN ARRAYS PARA PONER ELEMENTOS DENTRO DE UN ARRAY
+// db.inventory.updateMany(
+//     {},
+//     {
+//         $pull:{
+//             tags: "headphone"
+//         } 
+//     }
+// )
+// db.inventory.find()
+
+//USO DE PUSH EN ARRAYS PARA PONER ELEMENTOS DENTRO DE UN ARRAY
+// db.inventory.updateMany(
+//     {},
+//     {
+//         $pull:{
+//             tags: {
+//                 $in: ["headphone", "school", "book"]
+//             }
+//         } 
+//     }
+// )
+// db.inventory.find()
+
+//----------------
+//UPSERT (ACTUALIZAR E INSERTAR)
 

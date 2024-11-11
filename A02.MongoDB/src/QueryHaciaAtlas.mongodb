@@ -1,3 +1,61 @@
-use("sample_training")
+/*
+    use("sample_training");
 
-db.companies.find({ "name": { "$regex": "^w", "$options": "i" } })
+    //----------------------------
+    //Filtro
+    db.companies.find({ "name": { "$regex": "^w", "$options": "i" } });
+
+    //----------------------------
+    use("sample_training");
+
+    db.companies.updateMany(
+        { "name": { "$regex": "^w", "$options": "i" } },
+        {
+            $inc: {
+                "funding_rounds.$[elem].raised_amount": 1
+            }
+        },
+        {
+            arrayFilters: [
+                {
+                    "elem.raised_amount": { $type: "number" }
+                }
+            ]
+        }
+    );
+
+    db.companies.find({ "name": { "$regex": "^w", "$options": "i" } });
+*/
+/*/
+//Renombrar un atributo no el valor del mismo
+use("sample_training");
+
+    db.companies.updateMany(
+        //Query
+        {"name": { "$regex": "^w", "$options": "i" } },
+        //
+        {
+            $rename: {
+                "permalink": "permalink_2"
+            }
+        }    
+    )
+db.companies.find({ "name": { "$regex": "^w", "$options": "i" } });
+*/
+
+/*/
+//Eliminar un atributo
+use("sample_training");
+
+    db.companies.updateMany(
+        //Query
+        {"name": { "$regex": "^w", "$options": "i" } },
+        //
+        {
+            $unset: {
+                permalink_2: ""
+            }
+        }    
+    )
+db.companies.find({ "name": { "$regex": "^w", "$options": "i" } });
+*/

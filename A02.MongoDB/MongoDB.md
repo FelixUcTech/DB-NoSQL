@@ -271,7 +271,31 @@ Más acerca de BSON
 https://www.mongodb.com/resources/languages/bson
 
 
-## 
+## Comandos interesantes
+
+updateOne afecta solo un documento, el primero que coincida con el filtro.
+updateMany afecta todos los documentos que coincidan con el filtro.
+
+### Operadoor pop
+
+Remueve el primer o ùltimo elemento de un array
+
+```javascript
+db.students.updateOne(
+   { _id: 1 },
+   { $pop: { grades: -1 } }
+)
+```
+### Eliminar documentos
+
+```javascript
+use("Tienda")
+db.Productos.delaateOne({_id: 1})
+//or
+db.Productos.delaateOne({_id: ObjectId("stringgenerado")})
+```
+
+
 
 ## Conclusiones
 
