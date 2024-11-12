@@ -19,6 +19,10 @@ Nuestra base de datos en la nube requiere que configuremos
 - Un usuario este se configura en la nube, sin embargo que nuestra base de datos este en la nube no indica que cualquiera se pueda conectar desde cualquier lado, en la sección de NetworkAccess tenemos declaradas las ips a las que les damos permiso de hacer el login.
     - Peering podría decirse que es una forma avanzada de utilizar las configuraciones de acceso a la red que se tengan en algun servicio de nube.
 
+### Información de apoyo
+
+https://gist.github.com/nicobytes/fbd8c63977217855ba8afd3e240651c9
+
 ## ¿Qué son los documentos y colecciones?
 ### Documentos
 Un documento es una forma de organizar y almacenar información con un conjunto de pares **clave-valor** o **campo-valor**, este conjunto de información es alusivo a un dominio, es decir, la información de un producto, curso, campaña, inventario, etc, ese sería el dominio o igual llamadas identidades.
@@ -295,7 +299,168 @@ db.Productos.delaateOne({_id: 1})
 db.Productos.delaateOne({_id: ObjectId("stringgenerado")})
 ```
 
+## Operadores
 
+### $eq y $ne
+Uso de DataSet
+
+``` js
+use("platzi_store")
+
+db.inventory.drop()
+
+db.inventory.insertMany([
+  { _id: 1, item: { name: "ab", code: "123" }, qty: 15, tags: ["A", "B", "C"] },
+  { _id: 2, item: { name: "cd", code: "123" }, qty: 20, tags: ["B"] },
+  { _id: 3, item: { name: "ij", code: "456" }, qty: 25, tags: ["A", "B"] },
+  { _id: 4, item: { name: "xy", code: "456" }, qty: 30, tags: ["B", "A"] },
+  { _id: 5, item: { name: "mn", code: "000" }, qty: 20, tags: [["A", "B"], "C"] },
+])
+
+db.inventory.find()
+```
+Es un operador que viene de manera inplicita en algunos comandos que regularmente se usan en consutas en MongoDB.
+
+En el DataSet Anterior si usamos una consulta como la siguiente implicitamente ya estamos usando un equal:
+
+``` js
+use("platzi_store")
+
+//Using $eq
+db.inventory.find({qty: 20})
+```
+
+El ejemplo anterior de manera explicita es el siguiente:
+
+``` js
+use("platzi_store")
+
+//Using $eq
+db.inventory.find({qty: {$eq: 20}})
+```
+Consulta a un subdocumento
+``` js
+use("platzi_store")
+
+//Using $eq
+db.inventory.find({ "item.code": "123"})
+```
+El ejemplo siguiente es para cuando queremos hacer una actualización de varios campos basados en una condición de exclusión mediante el $ne, **Todo lo que no sea igual a 20 debería incrementar**
+``` js
+use("platzi_store")
+//Using $ne
+db.inventory.updateMany(
+    { "qty": {$ne: 20}}, //Condición de busqueda
+    {$inc: {qty: 10}} //Actualización
+)
+```
+
+
+
+
+
+
+### $gt, $gte, $lt y $lte
+Estos comparadores nos permiten hacer comparaciones entre números.
+
+```js
+// Using $gt (>: Mayor que) $gte (>= Mayor Igual)
+
+// Traera los valores 25 y 30, pero no partira por el 20, asi cumple Mayor que 20
+use("platzi_store")
+db.inventory.find({ qty: { $gt: 20 } })
+
+// Traera los valores 20, 25 y 30, sacara solamente el n°15 y asi cumple Mayor Igual que 20
+use("platzi_store")
+db.inventory.find({ qty: { $gte: 20 } })
+
+// Using $lt (<: Menor que) $lte (<= Menor Igual)
+
+// Traera solo el valor 15 y excluiria todos los otros valores
+use("platzi_store")
+db.inventory.find({ qty: { $lt: 20 } })
+
+// Traera solo los valores 15 y 20 del documento y excluiria todos los otros valores
+use("platzi_store")
+db.inventory.find({ qty: { $lte: 20 } })
+
+// Join - Traer todo los archivos que sean Mayor igual 25 y Menor igual 35 = El resultado debe ser 25 y 30
+use("platzi_store")
+db.inventory.find({ qty: { $gte: 25, $lte: 35 } })
+
+// Join - Traer todo los archivos que sean Mayor igual 20 y Menor igual 35 = El resultado debe ser 20 y 25
+use("platzi_store")
+db.inventory.find({ qty: { $gte: 20, $lte: 25 } })
+
+// New join
+
+// Segun la condicional no hay ningun sub documento que tenga qty:20 y 25
+use("platzi_store")
+db.inventory.find({
+    "item.name": "ab",
+    qty: { $gte: 20, $lte: 25 }
+})
+
+// Segun la condicional solo aparecera un dato, porque solamente se encuentra en el code 123
+use("platzi_store")
+db.inventory.find({
+    "item.code": "123",
+    qty: { $gte: 20, $lte: 25 }
+})
+
+// Quiero que no busque mi sub documento 123 y si los demas que tengan qty Mayor Igual 20 y Menor Igual 25
+use("platzi_store")
+db.inventory.find({
+    "item.code": { $ne: "123" },
+    qty: { $gte: 20, $lte: 25 }
+})
+```
+
+### $regex
+Este comando se utiliza como para realizar filtrol en base a texto, se apoya de expresiones regulares para poder hacer los filtro.
+
+Para este ejemplo se usa el siguiente DataSet
+
+``` js
+use("platzi_store")
+
+db.inventory.drop()
+
+db.inventory.insertMany([
+  { _id: 1, item: { name: "ab", code: "123", description : "Single line description."    }, qty: 15, tags: ["A", "B", "C"] },
+  { _id: 2, item: { name: "cd", code: "123", description : "First line\nSecond line"     }, qty: 20, tags: ["B"] },
+  { _id: 3, item: { name: "ij", code: "456", description : "Many spaces before     line" }, qty: 25, tags: ["A", "B"] },
+  { _id: 4, item: { name: "xy", code: "456", description : "Multiple\nline description"  }, qty: 30, tags: ["B", "A"] },
+  { _id: 5, item: { name: "mn", code: "000" }, qty: 20, tags: [["A", "B"], "C"] },
+])
+
+db.inventory.find()
+```
+Consultas con expresiones regulares.
+
+```js
+use("platzi_store")
+
+// Filtro dentro de un subdocumento
+// En este caso tiene que coicidir identicamente
+db.inventory.find({"item.description": "Single line description."})
+
+// Para una busca más general usamos expresiones regulares
+// $regex: /????/ busca de manera general en description si existe line
+// Esta forma es sensible a las mayúsculas y minúsculas
+db.inventory.find({"item.description": {$regex: /line/ }})
+
+// $regex: /????/ busca de manera general en description si existe line
+// Esta forma no es sensible a las mayúsculas y minúsculas
+db.inventory.find({"item.description": {$regex: /lInE/i }})
+
+//Busca algo que termine en una palabra o terminación específica
+db.inventory.find({"item.description": {$regex: /lInE$/i }})
+
+//Busca algo que inicie en una palabra o prefijo específica
+db.inventory.find({"item.description": {$regex: /^single/i }})
+
+```
 
 ## Conclusiones
 

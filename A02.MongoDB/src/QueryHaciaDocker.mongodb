@@ -180,3 +180,119 @@ use("Tienda")
 //----------------
 //UPSERT (ACTUALIZAR E INSERTAR)
 
+
+
+// //----------------
+// use("platzi_store")
+
+// db.inventory.drop()
+
+// db.inventory.insertMany([
+//   { _id: 1, item: { name: "ab", code: "123" }, qty: 15, tags: ["A", "B", "C"] },
+//   { _id: 2, item: { name: "cd", code: "123" }, qty: 20, tags: ["B"] },
+//   { _id: 3, item: { name: "ij", code: "456" }, qty: 25, tags: ["A", "B"] },
+//   { _id: 4, item: { name: "xy", code: "456" }, qty: 30, tags: ["B", "A"] },
+//   { _id: 5, item: { name: "mn", code: "000" }, qty: 20, tags: [["A", "B"], "C"] },
+// ])
+
+// db.inventory.find()
+
+
+// //---------------- Forma implicita
+// use("platzi_store")
+
+// //Using $eq
+// db.inventory.find({qty: 20})
+
+
+// //---------------- Forma explicita
+// use("platzi_store")
+
+// //Using $eq
+// db.inventory.find({qty: {$eq: 20}})
+
+//---------------- Subconsulta
+// use("platzi_store")
+
+// //Using $eq
+// db.inventory.find({ "item.code": {$eq : "123"}})
+
+// //---------------- Actualizar por exclusión
+// use("platzi_store")
+// //Using $ne
+// db.inventory.updateMany(
+//     { "qty": {$ne: 20}}, //Condición de busqueda
+//     {$inc: {qty: 10}} //Actualización
+// )
+
+// use("platzi_store")
+// db.inventory.find({
+//   qty: {$gt: 20}
+// })
+
+// //----------------
+// use("platzi_store")
+// db.inventory.find({
+//   qty: {$gt: 20} //Selecciona todo lo que se mayor a 20 en cantidad
+// })
+
+// //----------------
+// use("platzi_store")
+// db.inventory.find({
+//   qty: {$gte: 20} //Selecciona todo lo que se mayor a 20 en cantidad o igual en este caso
+// })
+
+// //----------------
+// use("platzi_store")
+// db.inventory.find({
+//   qty: {$lt: 30} //Selecciona todo lo que se menor a 30 en cantidad
+// })
+
+// //----------------
+// use("platzi_store")
+// db.inventory.find({
+//   qty: {$lte: 30} //Selecciona todo lo que se menor a 30 en cantidad o igual en este caso
+// })
+
+// //------------------------------------
+// //$regex
+// use("platzi_store")
+
+// db.inventory.drop()
+
+// db.inventory.insertMany([
+//   { _id: 1, item: { name: "ab", code: "123", description : "Single line description."    }, qty: 15, tags: ["A", "B", "C"] },
+//   { _id: 2, item: { name: "cd", code: "123", description : "First line\nSecond line"     }, qty: 20, tags: ["B"] },
+//   { _id: 3, item: { name: "ij", code: "456", description : "Many spaces before     line" }, qty: 25, tags: ["A", "B"] },
+//   { _id: 4, item: { name: "xy", code: "456", description : "Multiple\nline description"  }, qty: 30, tags: ["B", "A"] },
+//   { _id: 5, item: { name: "mn", code: "000" }, qty: 20, tags: [["A", "B"], "C"] },
+// ])
+
+// db.inventory.find()
+
+use("platzi_store")
+// //---------------------------------
+// // Filtro dentro de un subdocumento
+// db.inventory.find({"item.description": "Single line description."})
+
+// //---------------------------------
+// // Para una busca más general usamos expresiones regulares
+// // $regex: /????/ busca de manera general en description si existe line
+// db.inventory.find({"item.description": {$regex: /line/ }})
+
+// //---------------------------------
+// // Para una busca más general usamos expresiones regulares
+// // $regex: /????/ busca de manera general en description si existe line
+// // Esta forma no es sensible a las mayúsculas y minúsculas
+// db.inventory.find({"item.description": {$regex: /lInE/i }})
+
+// //Busca algo que termine en una palabra o terminación específica
+// db.inventory.find({"item.description": {$regex: /lInE$/i }})
+
+// //Busca algo que inicie en una palabra o prefijo específica
+// db.inventory.find({"item.description": {$regex: /^single/i }})
+
+// // Qué pasa si queremos buscar aún en multiples líneas
+// // Esta bsucara de manera que si la descripción tiene salto de línea considerara también la primera palabra para consultar.
+// db.inventory.find({"item.description": {$regex: /^single/im }})
+
