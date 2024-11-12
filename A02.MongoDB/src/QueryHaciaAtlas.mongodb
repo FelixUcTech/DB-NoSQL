@@ -59,3 +59,25 @@ use("sample_training");
     )
 db.companies.find({ "name": { "$regex": "^w", "$options": "i" } });
 */
+
+
+// //Projection
+// use("sample_training")
+// db.trips.find(
+//     //Consulta similar al where en sql
+//     {tripduration: {$gte: 500}},
+//     //projection (Apagar o encender información de la consultar)
+//     {tripduration: 1, usertype: 1}
+// )
+
+
+
+// //Projection
+// use("sample_training")
+// db.trips.find(
+//     //Consulta similar al where en sql
+//     {tripduration: {$gte: 500}},
+//     //projection (Apagar o encender información de la consultar)
+//     //Desactivar explicitamente el _Id
+//     {tripduration: 1, usertype: 1, _id: 0}
+// )

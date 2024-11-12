@@ -462,5 +462,161 @@ db.inventory.find({"item.description": {$regex: /^single/i }})
 
 ```
 
+### Projection
+
+Cuando requieres operar distintos valores, es importante entender que no siempre es bueno tener toda la información para ello la herramienta moestrda desde el entornode MongoCompass **nos permite seleccionar únicamente lo que requerimos para una manipulación y uso de datos más específica mediante 1 o 0.**
+
+![Projection](/A02.MongoDB/A02.MongoDB-Imagenes/Project.png)
+
+Utilizando nuestra base de datos de MongoCompass
+
+```js
+
+//Projection
+use("sample_training")
+db.trips.find(
+    //Consulta similar al where en sql
+    {tripduration: {$gte: 500}},
+    //projection (Apagar o encender información de la consultar)
+    {tripduration: 1, usertype: 1}
+)
+
+//Projection
+use("sample_training")
+db.trips.find(
+    //Consulta similar al where en sql
+    {tripduration: {$gte: 500}},
+    //projection (Apagar o encender información de la consultar)
+    //Desactivar explicitamente el _Id
+    {tripduration: 1, usertype: 1, _id: 0}
+)
+
+```
+
+### Operadores para Arrays
+
+#### DataSet
+Para realizar ejercicios con arrays carguemos a nuestras bases de datos la siguiente información:
+
+``` js
+use("platzi_store")
+
+db.inventory.drop()
+
+db.inventory.insertMany([
+  { _id: 1, item: { name: "ab", code: "123", description : "Single line description."    }, qty: 15, tags: [ "school", "book", "bag", "headphone", "appliance" ] },
+  { _id: 2, item: { name: "cd", code: "123", description : "First line\nSecond line"     }, qty: 20, tags: [ "appliance", "school", "book" ] },
+  { _id: 3, item: { name: "ij", code: "456", description : "Many spaces before     line" }, qty: 25, tags: [ "school", "book" ] },
+  { _id: 4, item: { name: "xy", code: "456", description : "Multiple\nline description"  }, qty: 30, tags: [ "electronics", "school" ] },
+  { _id: 5, item: { name: "mn", code: "000" }, qty: 20, tags: [ "appliance", "school" ] },
+])
+
+db.survey.drop();
+
+db.survey.insertMany([
+  {
+    _id: 1,
+    results: [
+      { product: "abc", score: 10 },
+      { product: "xyz", score: 5 },
+    ],
+  },
+  {
+    _id: 2,
+    results: [
+      { product: "abc", score: 8 },
+      { product: "xyz", score: 7 },
+    ],
+  },
+  {
+    _id: 3,
+    results: [
+      { product: "abc", score: 7 },
+      { product: "xyz", score: 8 },
+    ],
+  },
+  {
+    _id: 4,
+    results: [
+      { product: "abc", score: 7 },
+      { product: "def", score: 8 },
+    ],
+  },
+]);
+```
+
+#### $in & $nin (OR)
+
+El **$in** Funciona para entrar en los arrays y solicitar la información a manera de **OR lógica**, sin embargo, el **$nin** es lo contrario es una exclusión de los campos mencionados en la consuta, lo más peculiar de estos dos comandos es que son usados par avalores y para arrayas
+
+```js
+use("platzi_store")
+// in, valores y arrays
+db.inventory.find(
+    { qty: {$in: [20, 25] } }//,
+    //{qty: 1, }
+)
+
+use("platzi_store")
+// in, valores y arrays
+db.inventory.find(
+    { tags: { $in: ["book", "electronics"] } }
+)
+
+use("platzi_store")
+// nin, valores y arrays
+db.inventory.find(
+    { qty: {$nn: [20, 25] } }//,
+    //{qty: 1, }
+)
+
+use("platzi_store")
+// nin, valores y arrays
+db.inventory.find(
+    { tags: { $nin: ["book", "electronics"] } }
+)
+```
+
+#### Consulta a arrays sin operador
+
+Cuando hacemos una consulta directamente a array, sin ningún operador, indicará que a la clave que estemos apuntando solo nos arrojará un resultado la consulta si cumple estrictametente con el valor de la consulta.
+
+```js
+use("platzi_store")
+//Manda a llamar los que tenga los elementos
+db.inventory.find({tags: "book"})
+//Cumple y manda a llamar el documento correcpondiente
+db.inventory.find({tags: ["school","book"]})
+//No hay en el dataset un documento que cumpla estrictamente
+db.inventory.find({tags: ["book","school"]})
+```
+
+#### all  (AND)
+El operador all dentro de arrays ya es un homologo de una compuerta lógica and, este nos permite consultar dentro de los arrays los elementos que tengan n canctidad de elementos en forma condicionadal para que realice la consuta.
+
+```js
+use("platzi_store")
+// all, valores y arrays
+db.inventory.find(
+    { qty: {$all: [20, 25] } }//,
+    //{qty: 1, }
+)
+
+use("platzi_store")
+// all, valores y arrays
+db.inventory.find(
+    { tags: { $all: ["book", "electronics"] } }
+)
+```
+
+#### $size
+Qué el array tenga n cantidad de elementos.
+
+#### $elemMatch
+
+
+
+
+
 ## Conclusiones
 
