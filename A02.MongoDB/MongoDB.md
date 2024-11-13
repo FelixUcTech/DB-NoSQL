@@ -610,12 +610,241 @@ db.inventory.find(
 ```
 
 #### $size
-Qué el array tenga n cantidad de elementos.
+Retorna los documentos en función de un número arbitrio de elementos que contega el array "[]", es decir si yo le indico que cuente los elementos de un arreglo y tenga 2 elemento, me retornara los documentos donde haya sólo dos elementos.
+
+```js
+use("platzi_store")
+db.inventory.find(
+    { tags: {$size: 2 } } //Query
+)
+```
 
 #### $elemMatch
+Este nos sirve cuando tenemos un array con objetos dentro, y nor sirve para ser más específicos en el query. ejemplo se muestra en la colección de **survey** [DataSet](#dataset).
+
+```js
+//Uso del elemMatch
+use("platzi_store")
+db.survey.find({
+    results: {
+        $elemMatch: {
+            product: "abc",
+            score: {$lte: 7}
+        }
+
+    }
+})
+```
+
+### Operadores Lógicos
+#### AND
+
+![AND](/A02.MongoDB/A02.MongoDB-Imagenes/and.png)
+
+Se puede llegar a creer que la condicional and se trabaja normalmente de manera implicita, pero la forma explicita es más clara
+
+¿Qué consume menos recurso,l la forma implicita o la forma explicita?
+
+```js
+//AND implicito
+use("sample_training")
+db.inspections.find({
+    sector: {$regex: /TAX PREPARERS - 89/i},
+    result: {$regex: /Unable to/i}
+})
+
+//AND explicito
+// and: [{},{},{},{}]
+use("sample_training")
+db.inspections.find({
+    $and: [
+        {sector: {$regex: /TAX PREPARERS - 89/i}},
+        {result: {$regex: /Unable to/i}}
+    ]
+})
+```
+
+#### OR
+
+![OR](/A02.MongoDB/A02.MongoDB-Imagenes/or.png)
+
+Aquí es importante hacer la consulta para multiples atributos
+
+```js
+//OR explicito
+// OR: [{},{},{},{}]
+use("sample_training")
+db.inspections.find({
+    $or: [
+        {sector: {$regex: /TAX PREPARERS - 89/i}},
+        {result: {$regex: /Unable to/i}}
+    ]
+})
+```
+#### NOR
+
+![NOR](/A02.MongoDB/A02.MongoDB-Imagenes/nor.png)
+
+Es todo lo que no incluye mi cunsulta
+
+```js
+//NOR explicito
+// NOR: [{},{},{},{}]
+use("sample_training")
+db.inspections.find({
+    $nor: [
+        {sector: {$regex: /TAX PREPARERS - 89/i}},
+        {result: {$regex: /Unable to/i}}
+    ]
+})
+
+//Adición de una proejction
+//NOR explicito
+// NOR: [{},{},{},{}]
+use("sample_training")
+db.inspections.find(
+  {
+    $nor: [
+        {sector: {$regex: /TAX PREPARERS - 89/i}},
+        {result: {$regex: /Unable to/i}}
+    ]
+  },
+  //projection
+  {
+    result: 1,
+    _id:  0
+  }
+)
+```
+#### not
+Este no trabaja con array, se usa directamente en un atributo.
+
+```js
+//not
+// not: {}
+use("sample_training")
+db.inspections.find({
+    result: {$not: {$regex: /TAX PREPARERS - 89/i}}
+},
+//Projection
+{
+    result: 1
+}
+)
+```
+
+#### Funciones logicas combinadas
+Se pueden usar las condiciones lógicas de manera combinada
+
+Para saber un vuelo en específico que salga o aterrice en el aeropuesto de bogota
+
+```js
+//Vuelo X llegada o salida desde el mismo aeropuerto
+use(sample_training)
+db.routes.find({
+    $and: [
+        //Definir el vuelo
+        {
+            airplane: "E70"
+        },
+        //Definir or, ya sea que llegue o salga
+        {
+            $or: [
+                {dst_airport: "BOG"},
+                {src_airport: "BOG"}
+            ]
+        }
+
+    ]
+})
+```
 
 
 
+
+
+### Expresive operator
+
+#### DataSet
+
+```js
+use("platzi_store")
+
+db.monthlyBudget.drop()
+
+db.monthlyBudget.insertMany([
+  { "_id" : 1, "category" : "food",    "budget": 400, "spent": 450 },
+  { "_id" : 2, "category" : "drinks",  "budget": 100, "spent": 150 },
+  { "_id" : 3, "category" : "clothes", "budget": 100, "spent": 50  },
+  { "_id" : 4, "category" : "misc",    "budget": 500, "spent": 300 },
+  { "_id" : 5, "category" : "travel",  "budget": 200, "spent": 650 }
+])
+
+db.monthlyBudget.find()
+```
+#### Consulta utilizando operadores en forma expresiva 
+En MongoDB, los operadores de expresión permiten realizar comparaciones y manipulaciones de valores dentro de una consulta. Estos operadores se pueden usar en el campo de consulta para realizar cálculos y evaluaciones dinámicas en cada documento que se procesa. Entre ellos, el operador `$expr` es especialmente útil para realizar comparaciones y operaciones que involucren múltiples campos del mismo documento.
+
+
+El operador `$expr` permite utilizar expresiones de agregación dentro de una consulta. Esto permite comparar valores de diferentes campos del mismo documento o realizar cálculos más avanzados dentro de las condiciones de consulta. `$expr` es muy útil cuando necesitas hacer una comparación que involucre más de un campo en el mismo documento, ya que no es posible hacerlo directamente con otros operadores de comparación como `$gt`, `$lt`, `$eq`, etc.
+
+
+```js
+use("sample_training")
+db.trips.find({
+    $and: [
+        {$expr: {
+            $eq: ["$start station id", "$end station id"]
+        }},
+        {tripduration: {
+            $gte: 1200
+        }}
+    ] 
+}).count()
+```
+
+
+## Herramientas comunes al trabajar con MongoDB
+
+### Aggregation Framework
+Es una herramienta pensada para tener analisis de datos casi a nivel de datascienc. Pero el agregation framework es mucho más robusto dado que se pueden generar piplines [¿Qué es un data pipline?](/A01.Fundamentos/Fundamentos.md), es más para procesar datos. Sobre todo cuando hablamos en grandes volumenes de datos.
+
+![Aggregation Framework](/A02.MongoDB/A02.MongoDB-Imagenes/Aggregation%20Framework.png)
+
+Ya no usamos la función find, sino la función aggregate, pero lo mas poderoso de esta forma de operar es que funciona por capas. 
+
+```js
+//Aggregation Framework
+use("sample_airbnb")
+db.listingsAndReviews.aggregate([
+    {$match: {
+      amenities: "Wifi"
+    }}, //find
+    {$project: {
+      address: 1
+    }}, //projection
+    {$group: {_id: "$address.country", count: {$sum: 1} } } //Agrupar
+])
+```
+### Sort, limit & skip 
+```js
+//sort, limit y skip 
+use("sample_training")
+db.zips
+    .find({
+        pop: { $lte: 99 }
+    })
+    //sort:1 - Ascendente (números y letras)
+    .sort({
+        pop: -1
+    })
+    .limit(2)
+```
+Para técnicas de paginación:
+
+```js
+
+```
 
 
 ## Conclusiones

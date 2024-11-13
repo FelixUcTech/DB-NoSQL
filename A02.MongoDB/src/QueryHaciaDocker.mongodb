@@ -1,6 +1,6 @@
 // // Como en SQL o PosgreSQL si seleccionas y corres el Query, solo ejecutará lo seleccionado
 // // Para habilitar parte del codigo quitar los comentarios podemos usar "Ctr + }"
-use("Tienda")
+// use("Tienda")
 
 // //----------------------------
 // // Consulta de filtro
@@ -270,7 +270,7 @@ use("Tienda")
 
 // db.inventory.find()
 
-use("platzi_store")
+// use("platzi_store")
 // //---------------------------------
 // // Filtro dentro de un subdocumento
 // db.inventory.find({"item.description": "Single line description."})
@@ -373,4 +373,22 @@ use("platzi_store")
 // db.inventory.find(
 //     { tags: { $nin: ["electronics"] } }
 // )
+
+// use("platzi_store")
+// db.inventory.find(
+//     { tags: {$size: 2 } } //Query
+// )
+
+// //Uso del elemMatch
+// use("platzi_store")
+// db.survey.find({
+//     results: {
+//         $elemMatch: {
+//             product: "abc",
+//             score: {$lte: 7}
+//         }
+
+//     }
+// })
+
 

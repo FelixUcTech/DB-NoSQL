@@ -81,3 +81,126 @@ db.companies.find({ "name": { "$regex": "^w", "$options": "i" } });
 //     //Desactivar explicitamente el _Id
 //     {tripduration: 1, usertype: 1, _id: 0}
 // )
+
+
+// //AND implicito
+// use("sample_training")
+// db.inspections.find({
+//     sector: {$regex: /TAX PREPARERS - 89/i},
+//     result: {$regex: /Unable to/i}
+// })
+
+// //AND explicito
+// // and: [{},{},{},{}]
+// use("sample_training")
+// db.inspections.find({
+//     $and: [
+//         {sector: {$regex: /TAX PREPARERS - 89/i}},
+//         {result: {$regex: /Unable to/i}}
+//     ]
+// })
+
+// //OR explicito
+// // OR: [{},{},{},{}]
+// use("sample_training")
+// db.inspections.find({
+//     $or: [
+//         {sector: {$regex: /TAX PREPARERS - 89/i}},
+//         {result: {$regex: /Unable to/i}}
+//     ]
+// })
+
+// //NOR explicito
+// // NOR: [{},{},{},{}]
+// use("sample_training")
+// db.inspections.find({
+//     $nor: [
+//         {sector: {$regex: /TAX PREPARERS - 89/i}},
+//         {result: {$regex: /Unable to/i}}
+//     ]
+// })
+
+
+// //Adición de una proejction
+// //NOR explicito
+// // NOR: [{},{},{},{}]
+// use("sample_training")
+// db.inspections.find(
+//   {
+//     $nor: [
+//         {sector: {$regex: /TAX PREPARERS - 89/i}},
+//         {result: {$regex: /Unable to/i}}
+//     ]
+//   },
+//   //projection
+//   {
+//     result: 1,
+//     _id:  0
+//   }
+// )
+
+// //not
+// // not: {}
+// use("sample_training")
+// db.inspections.find({
+//     result: {$not: {$regex: /TAX PREPARERS - 89/i}}
+// },
+// {
+//     result: 1
+// }
+// )
+
+// //Vuelo X llegada o salida desde el mismo aeropuerto
+// use("sample_training")
+// db.routes.find({
+//     $and: [
+//         //Definir el vuelo
+//         {
+//             airplane: "E70"
+//         },
+//         //Definir or, ya sea que llegue o salga
+//         {
+//             $or: [
+//                 {dst_airport: "BOG"},
+//                 {src_airport: "BOG"}
+//             ]
+//         }
+
+//     ]
+// })
+
+
+// use("sample_training")
+// db.companies.find({
+//   "relationships.person.first_name": "Mark"
+// }, {
+//   name: 1,
+//   relationships: 1,
+// }).count() // 523
+
+
+
+// //Aggregation Framework
+// use("sample_airbnb")
+// db.listingsAndReviews.aggregate([
+//     {$match: {
+//       amenities: "Wifi"
+//     }}, //find
+//     {$project: {
+//       address: 1
+//     }}, //projection
+//     {$group: {_id: "$address.country", count: {$sum: 1} } } //Agrupar
+// ])
+
+// //sort, limit y skip 
+// use("sample_training")
+// db.zips
+//     .find({
+//         pop: { $lte: 99 }
+//     })
+//     //sort:1 - Ascendente (números y letras)
+//     .sort({
+//         pop: -1
+//     })
+//     .limit(2)
+

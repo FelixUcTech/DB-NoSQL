@@ -94,3 +94,55 @@ No hay que estar casado con una sola tecnología, hay que estar abiertos a usarl
 Una API (Interfaz de Programación de Aplicaciones, por sus siglas en inglés) es un conjunto de reglas y protocolos que permite que diferentes aplicaciones o servicios se comuniquen entre sí. Las APIs definen cómo se deben estructurar las solicitudes y respuestas entre sistemas, facilitando el intercambio de datos o la ejecución de funciones entre aplicaciones sin necesidad de conocer sus detalles internos.
 
 Por ejemplo, una API puede permitir que una aplicación móvil acceda a los datos de una base de datos en la nube o que dos servicios web intercambien información.
+
+## ¿Qué es un data pipline?
+
+Un data pipeline (o canalización de datos) es un conjunto de procesos y herramientas que permiten mover, transformar y almacenar datos desde una fuente (o múltiples fuentes) hacia un destino, generalmente un sistema de almacenamiento o análisis, de manera automatizada y eficiente. Los pipelines de datos son fundamentales en el procesamiento de grandes volúmenes de datos, ya que permiten integrar, limpiar, transformar y cargar los datos para su posterior análisis.
+
+Componentes clave de un Data Pipeline
+1. Fuente de datos: Los datos pueden provenir de diversas fuentes, como bases de datos, archivos, APIs, servicios web, sensores, entre otros.
+
+2. Ingesta de datos: Este es el proceso de extraer datos de las fuentes y prepararlos para ser procesados. Se puede hacer de manera en tiempo real (streaming) o en lotes (batch).
+
+3. Transformación de datos: Aquí, los datos extraídos son transformados de acuerdo con los requisitos específicos del análisis o almacenamiento. Esto puede incluir:
+
+    - Limpieza: Eliminar valores erróneos o incompletos.
+
+    - Conversión: Convertir los datos de un formato a otro (por ejemplo, de CSV a JSON).
+
+    - Agregación: Resumir los datos, por ejemplo, promediando valores o sumando totales.
+    
+    - Enriquecimiento: Combinar los datos con otras fuentes de información para mejorar su valor.
+
+4. Almacenamiento de datos: Después de ser procesados, los datos se almacenan en un sistema de almacenamiento adecuado, como bases de datos, data lakes (lagos de datos) o almacenes de datos (data warehouses).
+
+5. Consumo de datos: Finalmente, los datos almacenados pueden ser consultados y utilizados para análisis, informes, visualizaciones o para alimentar otros sistemas.
+
+Tipos de Data Pipelines
+1.  Pipelines en tiempo real (streaming): Estos pipelines procesan datos a medida que llegan. Se usan para escenarios donde los datos necesitan ser procesados y analizados inmediatamente, como el monitoreo en tiempo real o las recomendaciones personalizadas.
+
+2. Pipelines por lotes (batch): Este tipo de pipeline procesa grandes volúmenes de datos en intervalos definidos, como una vez al día, o en lotes programados. Son útiles cuando los datos no necesitan ser procesados de inmediato.
+
+3. Pipelines híbridos: Combinan ambos enfoques, procesando algunos datos en tiempo real y otros en lotes, dependiendo de la necesidad.
+
+Ejemplo de un Data Pipeline
+Un ejemplo básico de un pipeline de datos podría ser el siguiente:
+
+1. Ingesta: Extraer datos de un archivo CSV que contiene ventas de productos.
+Transformación: Limpiar los datos (eliminar registros con valores nulos), agregar las ventas por producto, y convertir los valores de fecha a un formato uniforme.
+2. Almacenamiento: Cargar los datos transformados en un data warehouse (por ejemplo, Amazon Redshift o Google BigQuery).
+3. Consumo: Los analistas consultan los datos almacenados para generar informes sobre las ventas por producto.
+
+Herramientas Comunes para Data Pipelines
+- Apache Kafka: Para procesamiento de datos en tiempo real.
+- Apache Airflow: Para orquestar y automatizar pipelines por lotes.
+- Apache NiFi: Para integrar y mover datos entre sistemas.
+- AWS Glue: Para transformaciones de datos en la nube de AWS.
+- Google Dataflow: Para procesamiento de datos en la nube de Google.
+- Talend: Plataforma para la integración y transformación de datos.
+
+Beneficios de un Data Pipeline
+- Automatización: Permite la ejecución automática de tareas de procesamiento de datos sin intervención manual.
+- Escalabilidad: Los pipelines pueden manejar grandes volúmenes de datos, escalando según sea necesario.
+- Eficiencia: Mejoran la eficiencia operativa al permitir el procesamiento de datos en tiempo real o por lotes.
+- Consistencia: Aseguran que los datos se procesen de manera consistente y sin errores.
