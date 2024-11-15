@@ -76,3 +76,8 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/linux,windows,macos
+
+#Aquí ignoramos los datos de mongo_data
+
+A02.MongoDB/mongo_data
+A03.Modelado/mongo_data
