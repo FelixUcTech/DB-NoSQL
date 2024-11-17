@@ -1,4 +1,16 @@
 # Modelado de Datos en MongoDB
+- [Modelado de Datos en MongoDB](#modelado-de-datos-en-mongodb)
+    - [Metodología para el modelado de Datos](#metodología-para-el-modelado-de-datos)
+    - [Crar una Base de Datos](#crar-una-base-de-datos)
+    - [Wordload](#wordload)
+    - [Validando colecciones](#validando-colección)
+        - [String](#strings)
+        - [Number and others](#number-and-others)
+        - [Arrays y subdocumentos](#arrays-y-subdocumentos)
+        - [Expresiones regulares](#expresion-regular)
+        - [Tips de validación](#tips-de-validación)
+    - [Conclusión](#conclusión)
+
 
 ## Metodología para el modelado de Datos
 
@@ -307,6 +319,171 @@ username: {
 
 ```
 
+### Arrays y subdocumentos
+
+Para validad los arrays, o subdocumentos se utiliza un tipo sitaxis que representa una anidación
+
+```js
+db.createCollection("producto", { //Nombre de la colección
+    validator:{
+        $jsonSchema: {
+            bsonType: 'object',
+            required: ["name","categoria"],//al poner l acategoria en requerido se debe cumplir agregarlo
+            properties:{
+                name:{
+                    bsonType: "string"
+                },
+                size:{
+                    bsonType: "array",
+                    minItems: 2, //El número mínimo de items que tiene que tener el array
+                    uniqueItems: true, //Sentencia para que no se repitan elementos en el array
+                    items:{//Con esta sentencia validamos que característiica tiene que tener los elementos dentro de array
+                        bsonType: 'string'
+                    }
+                },
+                categoria:{ //Validación de un subdocumento
+                    bsonType: 'object',
+                    required: ["grupo1","grupo2"],//si no tuviera estos requerimiento, poniendo un documento vacio se puede cumplir el requerimiento anterior.
+                    properties:{
+                        grupo1:{
+                            bsonType: "string"
+                        },
+                        grupo2:{
+                            bsonType: "string"
+                        },
+                        name:{
+                            bsonType: "string"
+                        }
+                    }
+                }
+            }
+        }            
+    }
+})
+```
+Si quitamos de requerimiento en el subdocumento, lo que podría ocacionar es que se ingresen datos cómo el siguiente.
+
+![Insersión](/A03.Modelado/A03.Modelado-Imagenes/requerimiento.png)
+
+### Expresion regular
+Las expresiones regulares son transversales a diversas tecnologías. 
+
+### Tips de validación
+#### No agregar información adicional
+Cuando hacemos una validación de datos estrictamente solos e valida lo que está declarado, pero si el usuario ingresa más datos en campos diferentes a los que se tienen de manera explicita en la validación, el motor de base de datos MongoDB permite hacerlo, a menos que de manera explicita y en pro de nuestras reglas de negocio pongamos una condición que no permita agregar otros campos más los que tengamos de manera explicita.
+
+```js
+use("platzi_store")
+db.createCollection("users", { 
+    validator: {  
+        $jsonSchema: { 
+            bsonType: "object",
+            required: ["email","password"],
+            additionalProperties: false, //Si está en false ya no permitirá agregar más campos, solo los que se tenga dentro de validation
+            properties: {
+                name: {
+                    bsonType: "string"
+                },
+                last_name: {
+                    bsonType: "string"
+                },
+                email: {
+                    bsonType: "string"
+                },
+                password: {
+                    bsonType: "string"
+                }
+            }
+        }
+    }
+})
+```
+#### Obtener la validación de las colecciones
+```js
+use("platzi_store")
+db.getCollectionInfos()
+```
+
+#### Actualizar una definición
+```js
+db.runCommand({
+    collMod: "users",
+          "validator": {
+            "$jsonSchema": {
+            "bsonType": "object",
+            "required": [
+                "email",
+                "password",
+                "role"
+            ],
+            additionalProperties: true,
+            "properties": {
+                "name": {
+                "bsonType": "string"
+                },
+                "last_name": {
+                "bsonType": "string"
+                },
+                "email": {
+                "bsonType": "string"
+                },
+                "password": {
+                "bsonType": "string"
+                },
+                "age": {
+                "bsonType": "number",
+                "minimum": 18,
+                "maximum": 99
+                },
+                "isSingle": {
+                "bsonType": "bool"
+                },
+                "role": {
+                "enum": [
+                    "customer",
+                    "seller",
+                    "admin"
+                ]
+                }
+            }
+            }
+        }
+})
+```
+
+## Relaciones
+Relaciones en una base de datos no relacional (este concepto puede generar confusión, pero la base de datos no relacional puede ser igualmente conocida como documental o no-sql), conceptualmente una base de datos No-SQL si pueden tener relaciones. 
+
+**Tipos de relaciones**
+
+![Relaciones](/A03.Modelado/A03.Modelado-Imagenes/relaciones.png)
+
+![Relaciones2](/A03.Modelado/A03.Modelado-Imagenes/relaciones2.png)
+
+### Embeber vs Referenciar
+Cuando hay subdocumentos significa que es una relación emebebida. El tipo de relación que se muestra en la siguiente imagen, es una relación 1 a 1, y se expresa de forma emebebida.
+
+![Embebido](/A03.Modelado/A03.Modelado-Imagenes/embebido.png)
+
+**¿Cual sería una forma referenciada?**
+
+Se hacen referncia entre documentos mediante el id. Existe la forma de conectarlos haciendo la referencia.
+
+![Referenciada](/A03.Modelado/A03.Modelado-Imagenes/referenciada.png)
+
+La forma de representar los subdocumentos, es decir las relaciones embebidas de manera gráfica se muestran en la siguiente imagen como sugerencia. 
+
+![Embebido2](/A03.Modelado/A03.Modelado-Imagenes/embebido2.png)
+
+algunas preguntas que nos darán luces para determinar la dirección en el uso de documentos embebido y por relacion será:
+- ¿Qué tan frecuente se actualiza esa información?
+- ¿Qué tan frecuente se consulta esa información?
+- ¿La información se consulta en conjunto o por partes?
+
+### 1 a 1 Embebido
+
 
 ## Conclusión
-v
+```js
+
+```
