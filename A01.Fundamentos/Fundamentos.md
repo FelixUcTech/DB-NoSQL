@@ -146,3 +146,8 @@ Beneficios de un Data Pipeline
 - Escalabilidad: Los pipelines pueden manejar grandes volúmenes de datos, escalando según sea necesario.
 - Eficiencia: Mejoran la eficiencia operativa al permitir el procesamiento de datos en tiempo real o por lotes.
 - Consistencia: Aseguran que los datos se procesen de manera consistente y sin errores.
+
+## MongoDB-Atlas & MongoDBCompass
+MongoDB Compass es el cliente de mongoDB Atlas el cual es el motor de base de datos en la Nube.
+
+##
