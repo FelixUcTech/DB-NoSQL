@@ -454,7 +454,7 @@ db.runCommand({
 ## Relaciones
 Relaciones en una base de datos no relacional (este concepto puede generar confusión, pero la base de datos no relacional puede ser igualmente conocida como documental o no-sql), conceptualmente una base de datos No-SQL si pueden tener relaciones. 
 
-**Tipos de relaciones**
+**Tipos de Relaciones**
 
 ![Relaciones](/A03.Modelado/A03.Modelado-Imagenes/relaciones.png)
 
@@ -482,8 +482,132 @@ algunas preguntas que nos darán luces para determinar la dirección en el uso d
 
 ### 1 a 1 Embebido
 
+Se muestra la siguiente relación 1 a 1, para un sistema de venta en línea. Salvo que el ecommerce quiera soportar multiples direcciones de envío la relación uno a uno cambiaría, sin embargo, para el ejemplo se mentiene una relación 1 a 1. 
+
+![1a1](/A03.Modelado/A03.Modelado-Imagenes/1a1embebbido.png)
+
+Un criterio para embeber documentos en otros, es cuando la información se consulta en conjunto, cuando se optiene de un usurio o un campo semantico, otra forma de entenderlo es que si el subdocumetno no tiene mucho significado o importancia si se consulta independientemente.
+
+Otro gran indicio es que cerca del 90% de las veces que se tenga un relación 1a1 es embebida.
+
+### 1 a 1 referenciada
+Una relación 1a1 referenciada cobra sentido cuando nos acercamos a limite de 16Mb de nuestro documento, esto por el echo que lo limita el mismo motor de base de datos pero de igual forma se vuelve ineficiente mantener demasiada información incluida en un solo documento. 
+
+En lugar de realizar múltiples consultas, puedes usar el framework de agregación para hacer una operación similar a un JOIN:
+
+```js
+//Colection user
+{
+  "_id": ObjectId("648b5f54d8c40e5ff"),
+  "name": "Félix Uc",
+  "email": "felix.uc@example.com",
+  "profile_id": ObjectId("648b5f54d8c40e1aa")  // Referencia a la colección 'profiles'
+}
+//Colection profiles
+{
+  "_id": ObjectId("648b5f54d8c40e1aa"),
+  "bio": "Data Science enthusiast.",
+  "website": "https://felixuc.dev"
+}
+
+db.users.aggregate([
+  {
+    $lookup: {
+      from: "profiles",           // Nombre de la colección relacionada
+      localField: "profile_id",   // Campo de referencia en 'users'
+      foreignField: "_id",        // Campo de referencia en 'profiles'
+      as: "profile"               // Nombre del campo resultante
+    }
+  },
+  {
+    $unwind: "$profile"           // Desenrolla el array resultante (opcional si siempre hay una relación 1:1)
+  }
+]);
+```
+
+### 1 a Muchos Embebidas (1 a pocos)
+
+Una forma de expresar una relación uno a muchos de forma embebida es mediante corchetes [], lo que se indica en la siguiente imagen.
+
+![Uno a muchos embebido](/A03.Modelado/A03.Modelado-Imagenes/1amuchosembebido.png)
+
+Cuando consultamos todo en un mismo momento. No es conveniente abusar de este tipo de documento, dado que busca no crecer demasido en los documentos enbebidos, ejemplo es qué no crezca al grado de revasar el limite de peso del documento en sí. 
+
+![Uno a muchos embebido ejemplo](/A03.Modelado/A03.Modelado-Imagenes/1amuchosejmplo.png)
+
+Ejemplo esta estrategía no sería muy bueno para almacenar los comentarios de un producto, porque estos pueden llegar a ser demasiados. 
+
+### 1 a Muchos Referencias (1 a muchos real)
+
+Un usuario puede tener muchas compras, o una publicación puede llegar a tener muchos comentarios, ahí es donde conviene hacer una relación 1 a muchos referenciadas. 
+```js
+{
+  "_id": ObjectId("648b5f54d8c40e5ff"),
+  "name": "Félix Uc",
+  "email": "felix.uc@example.com"
+}
+
+{
+  "_id": ObjectId("648b5f54d8c40e600"),
+  "user_id": ObjectId("648b5f54d8c40e5ff"), // Referencia al usuario
+  "item": "Laptop",
+  "amount": 1500
+},
+{
+  "_id": ObjectId("648b5f54d8c40e601"),
+  "user_id": ObjectId("648b5f54d8c40e5ff"),
+  "item": "Mouse",
+  "amount": 25
+}
+
+// Insertar en la colección 'users'
+db.users.insertOne({
+  name: "Félix Uc",
+  email: "felix.uc@example.com"
+});
+
+// Insertar en la colección 'purchases'
+db.purchases.insertMany([
+  {
+    user_id: ObjectId("648b5f54d8c40e5ff"), // ID del usuario
+    item: "Laptop",
+    amount: 1500
+  },
+  {
+    user_id: ObjectId("648b5f54d8c40e5ff"),
+    item: "Mouse",
+    amount: 25
+  }
+]);
+
+db.users.aggregate([
+  {
+    $lookup: {
+      from: "purchases",       // Colección relacionada
+      localField: "_id",       // Campo en 'users'
+      foreignField: "user_id", // Campo en 'purchases'
+      as: "user_purchases"     // Resultado combinado
+    }
+  }
+]);
+```
+
+### Muchos a Muchos
+![Muchos a muchos](/A03.Modelado/A03.Modelado-Imagenes/muchosamuchos.png)
+```js
+db.stores.aggregate([
+    {
+        $lookup: {
+            from: "products",
+            localField: "prodcuts_ids",//aunque sea un array, el framework aggregation interpreta de manera interna la relación muchos a muchos
+            foreignField: "_id",
+            as: "products"
+        }
+    }
+])
+```
 
 ## Conclusión
-```js
+¿Simplicidad o rendimiento? En mongo se prefiere un inicio en la Simplicidad, pero partiendo de la idea que se optimice con el timepo, esto es más estable, porque permite no realizar cambios brusco una vez una estructura dada que desde el inicio es compleja. La aplicación y el modelo crecen juntos.
 
-```
+![Simplicidad vs Rendimiento](/A03.Modelado/A03.Modelado-Imagenes/simplicidadvsrendimiento.png)
