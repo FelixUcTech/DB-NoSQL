@@ -133,4 +133,196 @@ Recuperar las 5 propiedades más económicas de estados unidos
 
 ![Pipeline 1](/A04.AggregationFramework/A04.AggregationFramework-Imagenes/Pipeline1.png)
 
+La operación siguiente se puede realizar también en mongoDB query language
+```js
+use("sample_airbnb")
+db.getCollection("listingsAndReviews").aggregate([
+    //$match
+    {
+        $match: {
+            //Solo en estados unidos
+            "address.country_code": "US"
+        }
+    },
+    //$sort
+    {
+        //ordenar de la más económica a la más costosa
+        $sort: {
+          price: 1
+        }
+    },
+    //$limit
+    {
+        //Mostrar únicamente los primero 5 elementos del consulta
+        $limit: 5
+    },
+    {
+      //Para no ver tanta información limitamos a dos campos
+      $project: {
+        _id: 0,
+        price: 1,
+        name: 1
+      }
+    }
+])
+```
+### $gruop
+El operador $group es exclusivo del Aggregation Framework. Este operador es fundamental para realizar operaciones de agrupamiento y acumulación en las colecciones, similar a cómo funciona GROUP BY en SQL. Sin embargo, no está disponible en consultas normales como las realizadas con find(). El Aggregation Framework está diseñado específicamente para realizar análisis y transformaciones de datos más complejas que las que permiten las operaciones estándar de consulta (find, insert, update, etc.). Operaciones como sumar, agrupar o calcular promedios requieren pasos adicionales que el framework puede manejar eficientemente.
+
+```js
+use("sample_airbnb")
+db.getCollection("listingsAndReviews").aggregate([
+    //$match primera etapa de pipeline
+    {
+        $match: {
+            //Solo en estados unidos
+            "address.country_code": "US"
+        }
+    },
+    //$sort segunda etapa del pipeline
+    {
+        //ordenar de la más económica a la más costosa
+        $sort: {
+            property_type: 1,
+            price: 1
+        }
+    },
+    //$Group
+    {
+        $group: {
+            //Primera etapa el _id es el ancla sobre el cual tiene que trabajar
+            _id: "$property_type",
+            //Segunda etapa, que hacer una vez agrupados los datos
+            //Para esto vamos a crear un objeto que nos guarde está información
+            MásVarato: {
+              $first: {
+                    nombre: "$name",
+                    precio: "$price",
+                    dirección: "$address"
+              }  
+            },
+            MásCaro: {
+                $last: {
+                    nombre: "$name",
+                    precio: "$price",
+                    dirección: "$address"
+                }
+            }
+        }
+    }
+])
+```
+
+Lo interesante de nuestro operador group es que no se modifica nada dentro dela base de datos, pero modific a la forma de presentar la información de la misma para compartirla de acuerdo con los requerimientos.
+
+### $project
+Modelar los resultados, nos permite presentar la información en el formato que lo requiera el cliente.
+
+![Modelado de datos](/A04.AggregationFramework/A04.AggregationFramework-Imagenes/modelado%20de%20datos.png)
+
+```js
+use("sample_airbnb")
+db.getCollection("listingsAndReviews").aggregate([
+    {
+        $match: {
+            //Solo en estados unidos
+            "address.country_code": "US"
+        }
+    },
+    //$sort
+    {
+            $sort: {
+            property_type: 1,
+            price: 1
+        }
+    },
+    //$Group
+    {
+        $group: {
+            _id: "$property_type",
+            MásVarato: {
+              $first: {
+                    nombre: "$name",
+                    precio: "$price",
+                    dirección: "$address"
+              }  
+            },
+            MásCaro: {
+                $last: {
+                    nombre: "$name",
+                    precio: "$price",
+                    dirección: "$address"
+                }
+            }
+        }
+    },
+    //Darle formato a la información de salida
+    {
+        $project: {
+            //con "$_id" estamos referenciado a la llave property_type
+            "_id": 0, //Para que este campo que por defecto aparce, no se muestre
+            "Tipo de propiedad":"$_id",
+            "Menor precio": "$MásVarato.precio",
+            "Mayor precio": "$MásCaro.precio"
+        }
+    }
+])
+```
+
+![Etapas 1](/A04.AggregationFramework/A04.AggregationFramework-Imagenes/project.png)
+
+Otra respuesta para homologar el resultado a lo que requiere la imagen de requeriemiento de formato.Uso de $toDouble en $project: Convierte los valores de Decimal128 a números simples (double), eliminando la estructura con "$numberDecimal".
+
+```js
+use("sample_airbnb")
+db.getCollection("listingsAndReviews").aggregate([
+    {
+        $match: {
+            //Solo en estados unidos
+            "address.country_code": "US"
+        }
+    },
+    //$sort
+    {
+            $sort: {
+            property_type: 1,
+            price: 1
+        }
+    },
+    //$Group
+    {
+        $group: {
+            _id: "$property_type",
+            MásVarato: {
+              $first: {
+                    nombre: "$name",
+                    precio: "$price",
+                    dirección: "$address"
+              }  
+            },
+            MásCaro: {
+                $last: {
+                    nombre: "$name",
+                    precio: "$price",
+                    dirección: "$address"
+                }
+            }
+        }
+    },
+    //Darle formato a la información de salida
+    {
+        $project: {
+            //con "$_id" estamos referenciado a la llave property_type
+            "_id": 0, //Para que este campo que por defecto aparce, no se muestre
+            "Tipo de propiedad":"$_id",
+            "Menor precio": {$toDouble: "$MásVarato.precio"},
+            "Mayor precio": {$toDouble: "$MásCaro.precio"}
+        }
+    }
+])
+```
+
+
+### $count y $avg
+En mongoDB puede llegar a ser complejo el uso de operadores, dado que son muchos, y puede llegar a ser complejo saber cuando usarlos.
 
