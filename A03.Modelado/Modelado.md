@@ -135,7 +135,7 @@ Qué mongoDB sea una base de datos no relacional, qué se flexible y versatil, e
 
 Una característica de mongo es definir la estructura, para validar los datos ingresado, ejemplo, si ingresamos un dato en una base de datos de usurios, y el email es un dato númerico y no tiene contraseña, ya estaríamos incurriendo en un error. 
 
-```js
+``` JavaScript 
 use("BaseDeDatosEjemplo")
 db.usurios.insertOne({ //Colección
     last_name: "Perenganito",
