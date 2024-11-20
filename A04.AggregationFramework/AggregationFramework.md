@@ -66,7 +66,6 @@ db.sales.aggregate([
     }  
 ])
 ```
-
 ### Casos para usar Aggregation Framework y no queries de MongoDB o map-reduce
 
 Para decidir esto es primordial entender los temas de costos y optimización, si se puede resolver con queries de MongoDB, es mejor realizarlo así, porque Aggregation Framework implica costos diferentes un performans diferente, por lo qué es importante analizar correctamente el alcance de cada herramienta.
@@ -121,8 +120,8 @@ db.getCollection('listingsAndReviews').aggregate([
 
 Para fines prácticos, db.collection.aggregate y db.getCollection('collectionName').aggregate son funcionalmente lo mismo, ya que ambos ejecutan el framework de agregación sobre una colección. La única diferencia es que db.getCollection se usa cuando el nombre de la colección es dinámico o contiene caracteres especiales, mientras que db.collection.aggregate es más directo y se usa para nombres estándar. Si el nombre de la colección no tiene restricciones, puedes usar cualquiera.
 
-## Operaciones
 
+## Operaciones
 ### $match
 
 El operador $match puede llegar a tener similitudes a la clausula de consulta SQL **WHERE**, mediante el recurso de AggregationFramework es combeniente utilizar **$match** en los primeros pasos de nuestra consulta, si bien se puede acotar el universo de datos indistintamente en cualquier paso de la consulta para nuestro pipeline, al hacerlo en un inicio hacemos consultas eficientes que reducen el poder requerido de computo, no es lo mismo hacer una operación para un billón de datos que únicamente para 400 documentos, entonces desde el inicio si la consulta lo permite es bueno utilizar esta función.
@@ -214,7 +213,6 @@ db.getCollection("listingsAndReviews").aggregate([
 ```
 
 Lo interesante de nuestro operador group es que no se modifica nada dentro dela base de datos, pero modific a la forma de presentar la información de la misma para compartirla de acuerdo con los requerimientos.
-
 ### $project
 Modelar los resultados, nos permite presentar la información en el formato que lo requiera el cliente.
 
@@ -321,8 +319,165 @@ db.getCollection("listingsAndReviews").aggregate([
     }
 ])
 ```
-
-
 ### $count y $avg
 En mongoDB puede llegar a ser complejo el uso de operadores, dado que son muchos, y puede llegar a ser complejo saber cuando usarlos.
 
+Por lo general count y avg se utilizan dentro de group, similar a las funciones que se usan de manera generalizada con **gruop by en sql**.
+
+**¿Por qué $sum: 1 para contar?**
+
+1. $group acumula valores: Dentro de $group, se usan operadores como $sum, $avg, $min, $max, etc., para realizar cálculos sobre los documentos que pertenecen a cada grupo. $sum: 1 funciona sumando "1" por cada documento en el grupo, lo que equivale a contar los documentos en dicho grupo.
+
+2. El operador $count es independiente: Aunque existe un operador llamado $count, este solo se usa fuera de $group, como una etapa independiente del pipeline para contar el total de documentos resultantes de las etapas anteriores. Dentro de $group, necesitas operadores de acumulación como $sum.
+
+```js
+use("sample_airbnb")
+use("sample_airbnb")
+db.getCollection("listingsAndReviews").aggregate([
+    {
+        $match: {
+            //Solo en estados unidos
+            "address.country_code": "US"
+        }
+    },
+    //$sort
+    {
+            $sort: {
+            property_type: 1,
+            price: 1
+        }
+    },
+    //$Group
+    {
+        $group: {
+          _id: "$property_type",
+          count: {
+            $sum: 1                                
+          },
+          PrecioMedia: {
+            $avg: "$price"
+          },
+          MásVarato: {
+            $first: {
+              nombre: "$name",
+              precio: "$price",
+              dirección: "$address"
+            }  
+          },
+          MásCaro: {
+            $last: {
+              nombre: "$name",
+              precio: "$price",
+              dirección: "$address"
+              }
+          }
+        }
+    },
+    //Darle formato a la información de salida
+    {
+      $project: {
+        "_id": 0, 
+        "Tipo de propiedad":"$_id",
+        "Total de tipo de propiedad": "$count",
+        "Precio medio de propiedades": {$toDouble: "$PrecioMedia"},
+        "Menor precio": {$toDouble: "$MásVarato.precio"},
+        "Mayor precio": {$toDouble: "$MásCaro.precio"}
+      }
+    }
+])
+```
+### $set
+Este operador se utiliza para dar formato igual que el $project, **¿Por qué tenemos otro operador?**  partiendo que project se tienen que denotar los capos que se quieran ver de manera explicita, esto no ocurre cuando usamos el operador $set, incluye todos los campos que ya estaban desde la última etapa de nuestro pipeline. 
+
+**Comparación entre `$set` y `$project`**
+
+| **Operador** | **Uso principal**                                                                                       | **Modifica documentos existentes** | **Selecciona o reestructura campos**          | **Ejemplo típico**                                                                                       |
+|--------------|--------------------------------------------------------------------------------------------------------|------------------------------------|----------------------------------------------|---------------------------------------------------------------------------------------------------------|
+| `$set`       | Agregar o modificar campos en los documentos existentes durante un pipeline.                           | ✅ Sí                             | ❌ No                                         | Añadir un campo calculado o actualizar uno existente: `{ $set: { total: { $sum: ["$price", "$tax"] } } }` |
+| `$project`   | Seleccionar, renombrar, ocultar o transformar los campos en los documentos finales del pipeline.       | ❌ No                             | ✅ Sí                                         | Excluir un campo sensible o renombrar uno: `{ $project: { _id: 0, name: 1, totalPrice: "$total" } }`     |
+
+---
+
+**¿Cuándo usar `$set`?**
+- Cuando necesitas **crear o modificar** un campo en los documentos.
+- Ideal para agregar información adicional o realizar cálculos durante las etapas del pipeline.
+- Es mas sencillo y es más optimo para tu tiempo utiliza `$set`
+
+**¿Cuándo usar `$project`?**
+- Si el documento original es bastante extenso y requieres formatearlo de manera fina
+
+```js
+use("sample_airbnb")
+db.getCollection("listingsAndReviews").aggregate([
+    {
+        $match: {
+            //Solo en estados unidos
+            "address.country_code": "US"
+        }
+    },
+    //$sort
+    {
+            $sort: {
+            property_type: 1,
+            price: 1
+        }
+    },
+    //$Group
+    {
+        $group: {
+            _id: "$property_type",
+            count: {
+                $sum: 1                                
+            },
+            PrecioMedia: {
+                $avg: "$price"
+            },
+            MásVarato: {
+              $first: {
+                    nombre: "$name",
+                    precio: "$price",
+                    dirección: "$address"
+              }  
+            },
+            MásCaro: {
+                $last: {
+                    nombre: "$name",
+                    precio: "$price",
+                    dirección: "$address"
+                }
+            }
+        }
+    },
+    {
+        $set: {
+            "Tipo de propiedades": "$_id",          
+            "Cantidad de propiedades": "$count",
+            "Precio promedio": { $toDouble: {$round: ["$PrecioMedia",2]}},
+            //Un array de documentos
+          "Propiedades Destacadas": [
+            {
+                "Tipo": "Mas bajo",
+                "Nombre": "$MásVarato.nombre",
+                "Precio": {$toDouble:"$MásVarato.precio"},
+            },
+            {
+                "Tipo": "Mas alto",
+                "Nombre": "$MásCaro.nombre",
+                "Precio": {$toDouble:"$MásCaro.precio"},
+            }]
+        }
+    },
+    {
+        $project: {
+            "_id": 0,
+            "count":0, 
+            "PrecioMedia": 0, 
+            "MásVarato":0,
+            "MásCaro":0,
+            "dirección": 0
+        }
+    }
+])
+```
+
+## Etapas de AggregationFramework
