@@ -481,3 +481,100 @@ db.getCollection("listingsAndReviews").aggregate([
 ```
 
 ## Etapas de AggregationFramework
+### $unwind
+El operador $unwind en el Aggregation Framework de MongoDB descompone un campo de tipo array en múltiples documentos, generando un documento por cada elemento del array. Esto permite procesar y analizar los datos dentro de arrays como si fueran documentos individuales, facilitando operaciones como filtrado, agrupamiento y transformación. Es útil cuando necesitas tratar elementos de un array por separado o combinarlos con otras colecciones. También puedes controlar cómo manejar arrays vacíos o campos inexistentes utilizando las opciones `preserveNullAndEmptyArrays` y `includeArrayIndex`.
+
+```js
+use("sample_airbnb")
+db.getCollection("listingsAndReviews").aggregate([
+  //Desconponer el el array de amenities
+  {$unwind: "$amenities"},
+  //Una vez extraida esa información de los arrays
+  //Se agrupan por amenities
+  {$group: {
+    _id: "$amenities",
+    count: {
+      $sum: 1
+    }
+  }},
+  //Organizar del que se encuntra más al que se encuentra menos
+  {$sort: {
+    count: -1
+  }},
+  {$limit: 10},
+  {$project: {
+    _id:0,
+    Amenidad: "$_id",
+    Cantida: "$count",
+    "Porcentaje presente":{
+        //Es similar a python, operaciones anidadas que se resuelven de adentro hacia afuera
+        //$literal nos indica que vamos usar una constante tal cual está
+        $round: [{$multiply:[{$divide:["$count",{$literal: 5600}]},100]},2]
+    }
+  }}
+])
+```
+### $out
+Como almacenar los resultado en mongoDB, esto no queda en memoria física, sino solo memoria volatil. Para esto usamos $out, si queremos exportar el resultado de forma sencilla. Este operador debe ser la última etapa del aggregate, si el nombre es el mismo nombre de una colección que ya existe automaticamente la va sobreescribir, $out afecta el rendimiento, los indices no se realizan de manera automaticamente.
+
+```js
+use("sample_airbnb")
+db.getCollection("listingsAndReviews").aggregate([
+    {$sort: {
+        "address.market": 1,
+        price: -1
+    }},
+    {
+        $group: {
+            _id: "$address.market",
+            masCostosas: {
+                $first: {
+                    name: "$name",
+                    price: "$price"
+                }
+            }
+        }
+    } ,
+    {
+        $out: "propiedadesMasCostosas"
+    }
+])
+
+db.propiedadesMasCostosas.find()
+```
+### $geoNear
+En el caso de nuestra base de datos esta en un directorio nuestro indice de localización por lo cual es necesario crear un indice geoespacial para podertrabajar.
+
+```js
+use("sample_airbnb")
+// db.listingsAndReviews.createIndex({ "address.location": "2dsphere" });
+
+db.getCollection("listingsAndReviews").aggregate([
+    //El resultado de esta función es un filtrado de los puntos a 30 kilometros a la redonda de nuestra referencia
+    {$geoNear:{
+     //Le ponemos de ferencia un valor de las cordenadas de un punto
+        near: { type: 'Point', coordinates: [ -73.95810439176357, 40.800552066589546] },
+        //Donde guardamos la distancia
+        distanceField: 'distancia',
+        //Máximo al rededor
+        //geoNear trabaja con metro
+        //30km
+        maxDistance: 30000,
+        //Es más exacto pero requieren más procesamiento
+        spherical: true
+    }},
+    // {$count: 'total a $maxDistance'        
+    // }
+])
+```
+
+
+
+
+
+
+
+
+
+
+

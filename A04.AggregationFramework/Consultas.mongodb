@@ -1,2 +1,20 @@
+use("sample_airbnb")
+// db.listingsAndReviews.createIndex({ "address.location": "2dsphere" });
 
-
+db.getCollection("listingsAndReviews").aggregate([
+    //El resultado de esta función es un filtrado de los puntos a 30 kilometros a la redonda de nuestra referencia
+    {$geoNear:{
+     //Le ponemos de ferencia un valor de las cordenadas de un punto
+        near: { type: 'Point', coordinates: [ -73.95810439176357, 40.800552066589546] },
+        //Donde guardamos la distancia
+        distanceField: 'distancia',
+        //Máximo al rededor
+        //geoNear trabaja con metro
+        //30km
+        maxDistance: 30000,
+        //Es más exacto pero requieren más procesamiento
+        spherical: true
+    }},
+    // {$count: 'total a $maxDistance'        
+    // }
+])
