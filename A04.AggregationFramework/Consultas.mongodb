@@ -1,20 +1,39 @@
-use("sample_airbnb")
+use("sample_analytics")
 // db.listingsAndReviews.createIndex({ "address.location": "2dsphere" });
 
-db.getCollection("listingsAndReviews").aggregate([
-    //El resultado de esta función es un filtrado de los puntos a 30 kilometros a la redonda de nuestra referencia
-    {$geoNear:{
-     //Le ponemos de ferencia un valor de las cordenadas de un punto
-        near: { type: 'Point', coordinates: [ -73.95810439176357, 40.800552066589546] },
-        //Donde guardamos la distancia
-        distanceField: 'distancia',
-        //Máximo al rededor
-        //geoNear trabaja con metro
-        //30km
-        maxDistance: 30000,
-        //Es más exacto pero requieren más procesamiento
-        spherical: true
+db.getCollection("customers").explain("executionStats").aggregate([ 
+    //Desde customers estoy haciendo traer la información de accounts
+    //En este primer lookup estamos creando un array que nos permite trabajar
+    {$lookup: {
+      //Especificamos de que colección estamos partiendo
+      from: "accounts",
+      //Indica el campo local de la primera colección
+      localField: "accounts",    
+      foreignField: "account_id",
+      as: "account_info" //este es el array creado
     }},
-    // {$count: 'total a $maxDistance'        
-    // }
+    //Extraemos la información del array
+    {$unwind:"$account_info"},
+    
+    //Ahora tenemos juntos información de costumers y account
+    //Se junta más información con transactions
+    {$lookup: {
+        //Especificamos de que colección estamos partiendo
+        from: "transactions",
+        //Indica el campo local de la primera colección
+        localField: "account_info.account_id",    
+        foreignField: "account_id",
+        as: "transactions_inf" //este es el array creado
+      }},
+      //Extraemos la información del array
+    {$unwind:"$transactions_inf"},
+    {$sort:{
+      "transactions_inf.transaction_count": -1
+    }},
+    {$project: {
+       "_id": 0,
+       "Cliente": "$name",
+       "Número de transacciones": "$transactions_inf.transaction_count"
+    }},
+    {$limit: 5}
 ])
